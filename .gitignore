@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+data/inventory.db
+data/ai_settings.json
+.env
