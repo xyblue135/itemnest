@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5
+
+- 启动脚本改为直接使用系统 Python，不再创建或激活 `.venv`。
+- Windows 优先使用 `py -3`，不可用时回退到 `python`。
+- Linux/macOS 优先使用 `python3`，不可用时回退到 `python`。
+- 启动时先检查运行依赖，仅在缺少依赖时通过系统 Python 的 pip 安装 `requirements.txt`。
+- 数据库与前端 UI 均不变，可直接沿用 v0.4 的 `data/inventory.db`。
+- FastAPI 应用版本更新到 0.5.0。
+
 ## v0.4
 
 - 存储 UI 改为“箱子优先”浏览：默认只展示箱子，不展示物品名称。

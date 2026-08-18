@@ -4,3 +4,4 @@ __pycache__/
 data/inventory.db
 data/ai_settings.json
 .env
+*.patch

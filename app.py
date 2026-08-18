@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="物栈 ItemNest", version="0.4.0", lifespan=lifespan)
+app = FastAPI(title="物栈 ItemNest", version="0.5.0", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
