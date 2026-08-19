@@ -16,6 +16,7 @@ if not exist "backend\target\itemnest-0.7.0.jar" (
 )
 
 set "ITEMNEST_DATA_DIR=%CD%\data"
+set "SERVER_PORT=8765"
 start "" cmd /c "timeout /t 2 /nobreak >nul & start http://127.0.0.1:8765"
 
 echo.

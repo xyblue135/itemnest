@@ -22,6 +22,7 @@ if not defined PNPM_CMD (
 )
 
 set "ITEMNEST_DATA_DIR=%CD%\data"
+set "SERVER_PORT=8765"
 start "ItemNest Backend" cmd /k "cd /d ""%CD%\backend"" && set ""ITEMNEST_DATA_DIR=%ITEMNEST_DATA_DIR%"" && call mvnw.cmd spring-boot:run"
 
 pushd frontend
