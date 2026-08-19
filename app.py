@@ -3,12 +3,13 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 import sqlite3
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import ai
 import db
+import mq
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
@@ -17,10 +18,14 @@ STATIC_DIR = BASE_DIR / "static"
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db.init_db()
-    yield
+    await mq.start()
+    try:
+        yield
+    finally:
+        await mq.stop()
 
 
-app = FastAPI(title="物栈 ItemNest", version="0.5.0", lifespan=lifespan)
+app = FastAPI(title="物栈 ItemNest", version="0.6.0", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
@@ -92,24 +97,36 @@ def containers(): return db.list_containers()
 
 
 @app.post("/api/containers")
-def add_container(payload: ContainerIn):
-    try: return db.create_container(payload.model_dump())
-    except sqlite3.IntegrityError: raise HTTPException(409, "箱子名称已存在")
+def add_container(payload: ContainerIn, background_tasks: BackgroundTasks):
+    try:
+        container = db.create_container(payload.model_dump())
+        background_tasks.add_task(mq.publish_event, "inventory.container.created", {"container": container})
+        return container
+    except sqlite3.IntegrityError:
+        raise HTTPException(409, "箱子名称已存在")
 
 
 @app.patch("/api/containers/{container_id}")
-def patch_container(container_id: int, payload: ContainerPatch):
+def patch_container(container_id: int, payload: ContainerPatch, background_tasks: BackgroundTasks):
     if not db.get_container(container_id): raise HTTPException(404, "箱子不存在")
-    try: return db.update_container(container_id, payload.model_dump(exclude_none=True))
-    except sqlite3.IntegrityError: raise HTTPException(409, "箱子名称已存在")
+    try:
+        container = db.update_container(container_id, payload.model_dump(exclude_none=True))
+        background_tasks.add_task(mq.publish_event, "inventory.container.updated", {"container": container})
+        return container
+    except sqlite3.IntegrityError:
+        raise HTTPException(409, "箱子名称已存在")
 
 
 @app.delete("/api/containers/{container_id}")
-def remove_container(container_id: int):
+def remove_container(container_id: int, background_tasks: BackgroundTasks):
+    container = db.get_container(container_id)
+    if not container: raise HTTPException(404, "箱子不存在")
     try:
         if not db.delete_container(container_id): raise HTTPException(404, "箱子不存在")
+        background_tasks.add_task(mq.publish_event, "inventory.container.deleted", {"container": container})
         return {"ok": True}
-    except ValueError as e: raise HTTPException(409, str(e))
+    except ValueError as e:
+        raise HTTPException(409, str(e))
 
 
 @app.get("/api/items")
@@ -118,27 +135,40 @@ def items(q: str = Query(default="", max_length=200), container_id: int | None =
 
 
 @app.post("/api/items")
-def add_item(payload: ItemIn):
+def add_item(payload: ItemIn, background_tasks: BackgroundTasks):
     if not db.get_container(payload.container_id): raise HTTPException(400, "目标箱子不存在")
-    return db.create_item(payload.model_dump())
+    item = db.create_item(payload.model_dump())
+    background_tasks.add_task(mq.publish_event, "inventory.item.created", {"item": item})
+    return item
 
 
 @app.patch("/api/items/{item_id}")
-def patch_item(item_id: int, payload: ItemPatch):
-    if not db.get_item(item_id): raise HTTPException(404, "物品不存在")
+def patch_item(item_id: int, payload: ItemPatch, background_tasks: BackgroundTasks):
+    before = db.get_item(item_id)
+    if not before: raise HTTPException(404, "物品不存在")
     data = payload.model_dump(exclude_unset=True)
     if data.get("container_id") is not None and not db.get_container(data["container_id"]): raise HTTPException(400, "目标箱子不存在")
-    return db.update_item(item_id, data)
+    item = db.update_item(item_id, data)
+    event = "inventory.item.moved" if data.get("container_id") is not None and data.get("container_id") != before.get("container_id") else "inventory.item.updated"
+    background_tasks.add_task(mq.publish_event, event, {"before": before, "item": item})
+    return item
 
 
 @app.delete("/api/items/{item_id}")
-def remove_item(item_id: int):
+def remove_item(item_id: int, background_tasks: BackgroundTasks):
+    item = db.get_item(item_id)
+    if not item: raise HTTPException(404, "物品不存在")
     if not db.delete_item(item_id): raise HTTPException(404, "物品不存在")
+    background_tasks.add_task(mq.publish_event, "inventory.item.deleted", {"item": item})
     return {"ok": True}
 
 
 @app.get("/api/settings")
 def get_settings(): return ai.get_settings(False)
+
+
+@app.get("/api/mq/status")
+def mq_status(): return mq.status()
 
 
 @app.post("/api/settings")
@@ -150,6 +180,19 @@ async def chat(payload: ChatIn): return await ai.chat(payload.message)
 
 
 @app.post("/api/ai/execute")
-def execute(payload: ActionIn):
-    try: return ai.execute_action(payload.action)
-    except (ValueError, sqlite3.IntegrityError) as e: raise HTTPException(400, str(e))
+def execute(payload: ActionIn, background_tasks: BackgroundTasks):
+    try:
+        result = ai.execute_action(payload.action)
+        action_type = payload.action.get("type", "unknown")
+        event_map = {
+            "add_item": "inventory.item.created",
+            "update_item": "inventory.item.updated",
+            "move_item": "inventory.item.moved",
+            "delete_item": "inventory.item.deleted",
+            "add_container": "inventory.container.created",
+        }
+        event = event_map.get(action_type, "inventory.ai.executed")
+        background_tasks.add_task(mq.publish_event, event, {"via": "ai", "action": payload.action, "result": result})
+        return result
+    except (ValueError, sqlite3.IntegrityError) as e:
+        raise HTTPException(400, str(e))

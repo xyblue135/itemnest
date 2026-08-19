@@ -65,7 +65,7 @@ data/inventory.db
 
 这意味着数据库不是浏览器 LocalStorage，也不是 JSON 清单；电脑端 FastAPI 服务直接读写 `inventory.db`，手机通过局域网访问同一个 FastAPI 服务，因此电脑和手机看到的是同一份数据。
 
-备份时直接复制该文件即可。应用第一次启动且数据库为空时会导入 `seed.py` 中的完整初始清单。v0.5 不修改数据库结构，继续兼容 v0.4 及更早版本的数据。支持从 v0.1 / v0.2 / v0.3 数据库继续升级：把旧版 `inventory.db` 放进新版 `data/` 后启动，程序会按迁移记录自动补齐新增条目，不会覆盖你自己后来添加或修改的其他数据，也不会重复导入。
+备份时直接复制该文件即可。应用第一次启动且数据库为空时会导入 `seed.py` 中的完整初始清单。v0.6 不修改数据库结构，继续兼容 v0.4 及更早版本的数据。支持从 v0.1 / v0.2 / v0.3 数据库继续升级：把旧版 `inventory.db` 放进新版 `data/` 后启动，程序会按迁移记录自动补齐新增条目，不会覆盖你自己后来添加或修改的其他数据，也不会重复导入。
 
 ## 技术栈
 
@@ -73,6 +73,7 @@ data/inventory.db
 - Database: SQLite
 - Frontend: 原生 HTML / CSS / JavaScript
 - AI: OpenAI-compatible `/v1/chat/completions`
+- Message Queue: RabbitMQ + aio-pika
 - App: PWA
 
 ## 后续适合增加
@@ -94,3 +95,25 @@ data/inventory.db
 - AI 库存快照增加箱子备注，能够理解“不统计内部物品”的容器
 - 清单总计：14 个箱子、78 类物品
 - 增加 v0.2 → v0.3 的一次性数据库增量迁移
+
+## RabbitMQ 消息队列（v0.6）
+
+v0.6 将 RabbitMQ 作为**可降级的异步事件层**，SQLite 仍然是库存数据的唯一权威来源。新增、编辑、移动或删除物品/箱子时，数据库先正常提交，然后后台再发布 `inventory.#` 事件。因此 RabbitMQ 没启动、网络断开或 Worker 停止，都不会阻止你继续管理库存。
+
+默认连接：
+
+```text
+amqp://guest:guest@127.0.0.1/
+Exchange: itemnest.events
+Queue: itemnest.inventory.events
+```
+
+可使用环境变量修改：`ITEMNEST_RABBITMQ_ENABLED`、`ITEMNEST_RABBITMQ_URL`、`ITEMNEST_RABBITMQ_EXCHANGE`、`ITEMNEST_RABBITMQ_QUEUE`。如果暂时不想使用 RabbitMQ，将 `ITEMNEST_RABBITMQ_ENABLED=0` 即可。
+
+启动 ItemNest 仍然执行 `start.bat`。RabbitMQ Worker 是独立进程，需要时再运行：
+
+```text
+start_worker.bat
+```
+
+Worker 使用消息确认和 `prefetch_count=16` 消费 durable queue，并把收到的事件以 JSON Lines 形式写入 `data/mq_events.jsonl`。这个日志是异步事件记录，不代替 `data/inventory.db`。

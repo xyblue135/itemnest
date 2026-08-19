@@ -11,9 +11,9 @@ function escapeHtml(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','
 function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2200);}
 
 async function loadAll(){
-  const [summary, containers, items, settings] = await Promise.all([api('/api/summary'), api('/api/containers'), api('/api/items'), api('/api/settings')]);
+  const [summary, containers, items, settings, mqStatus] = await Promise.all([api('/api/summary'), api('/api/containers'), api('/api/items'), api('/api/settings'), api('/api/mq/status')]);
   state.containers=containers; state.items=items;
-  renderSummary(summary); renderContainerOptions(); renderContainers(); applySettings(settings); renderSearchState();
+  renderSummary(summary); renderContainerOptions(); renderContainers(); applySettings(settings); applyMqStatus(mqStatus); renderSearchState();
   if(state.openContainerId) renderContainerDetail(state.openContainerId);
 }
 function renderSummary(s){$('#statContainers').textContent=s.containers;$('#statItems').textContent=s.items;$('#statQuantity').textContent=s.quantity;$('#statSpecial').textContent=s.special;}
@@ -106,6 +106,9 @@ $$('.nav-btn').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.vi
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();switchView('inventory');$('#searchInput').focus();}if(e.key==='Escape'){if(!$('#modalBackdrop').hidden)$('#modalBackdrop').hidden=true;else if(!$('#containerModalBackdrop').hidden)$('#containerModalBackdrop').hidden=true;else if(!$('#containerDetailBackdrop').hidden)closeContainerDetail();}});
 
 function applySettings(s){$('#baseUrlInput').value=s.base_url||'';$('#modelInput').value=s.model||'auto';$('#keyState').textContent=s.has_api_key?'API Key 已保存在本机服务器':'尚未保存 API Key';$('#keyState').style.color=s.has_api_key?'#16a34a':'#98a2b3';$('#aiStatusText').textContent=s.has_api_key?'AI 接口已配置':'本地检索模式';$('#aiStatusDot').style.background=s.has_api_key?'#22c55e':'#f59e0b';}
+function applyMqStatus(s){const ok=s.enabled&&s.connected;$('#mqStatusText').textContent=!s.enabled?'已禁用':ok?'RabbitMQ 已连接':'RabbitMQ 未连接（主功能不受影响）';$('#mqStatusDot').style.background=!s.enabled?'#98a2b3':ok?'#22c55e':'#f59e0b';$('#mqUrl').textContent=s.url||'—';$('#mqExchange').textContent=s.exchange||'—';$('#mqQueue').textContent=s.queue||'—';$('#mqError').hidden=!s.last_error;$('#mqError').textContent=s.last_error?`最近错误：${s.last_error}`:'';}
+async function refreshMqStatus(){try{applyMqStatus(await api('/api/mq/status'));}catch(e){toast(e.message);}}
+$('#refreshMqBtn').addEventListener('click',refreshMqStatus);
 $('#settingsForm').addEventListener('submit',async e=>{e.preventDefault();const data={base_url:$('#baseUrlInput').value.trim(),model:$('#modelInput').value.trim()||'auto'};if($('#apiKeyInput').value.trim())data.api_key=$('#apiKeyInput').value.trim();try{const s=await api('/api/settings',{method:'POST',body:JSON.stringify(data)});applySettings(s);$('#apiKeyInput').value='';$('#settingsSaved').textContent='已保存';toast('AI 设置已保存');setTimeout(()=>$('#settingsSaved').textContent='',1800);}catch(e){toast(e.message);}});
 $('#toggleKeyBtn').addEventListener('click',()=>{const input=$('#apiKeyInput');input.type=input.type==='password'?'text':'password';$('#toggleKeyBtn').textContent=input.type==='password'?'显示':'隐藏';});
 

@@ -38,3 +38,14 @@
 - 纯甄酸奶箱子新增 VGA 视频采集卡，并记录 HDMI/USB 输出、OBS/手机软件采集备注。
 - 物品类别由 63 类增加到 74 类。
 - 增加 v0.1 数据库的一次性增量迁移，保留旧数据库时自动补齐新增条目且不会重复导入。
+
+## v0.6.0 - RabbitMQ 消息队列
+
+- 新增 RabbitMQ / AMQP 0-9-1 消息队列集成，使用 `aio-pika`。
+- SQLite 继续作为唯一权威数据源；RabbitMQ 不参与核心 CRUD 提交，避免消息队列故障影响物品管理。
+- 物品/箱子的新增、修改、移动、删除成功后异步发布 `inventory.#` 事件。
+- 使用 durable topic exchange、durable queue、persistent message 和 publisher confirms。
+- 新增 `/api/mq/status`，设置页可查看 RabbitMQ 连接状态、Exchange、Queue 和最近错误。
+- 新增独立 `mq_worker.py` 消费者，将消费事件追加到 `data/mq_events.jsonl`。
+- 新增 `start_worker.bat` / `start_worker.sh`，继续使用系统 Python，不创建虚拟环境。
+- RabbitMQ 不可用时主应用自动降级，SQLite、搜索、AI 和 CRUD 继续正常工作。

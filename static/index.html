@@ -138,6 +138,16 @@
           </form>
         </div>
         <div class="settings-card">
+          <div class="settings-title"><div class="settings-icon">MQ</div><div><h3>RabbitMQ 消息队列</h3><p>库存写操作成功后异步发布事件，不阻塞 SQLite 主流程。</p></div></div>
+          <div class="lan-help mq-status-box">
+            <p><span id="mqStatusDot" class="mini-dot"></span><b id="mqStatusText">检查 RabbitMQ…</b></p>
+            <p>连接：<code id="mqUrl">—</code></p>
+            <p>Exchange：<code id="mqExchange">—</code>　Queue：<code id="mqQueue">—</code></p>
+            <p id="mqError" hidden></p>
+            <button type="button" class="outline-btn" id="refreshMqBtn">刷新状态</button>
+          </div>
+        </div>
+        <div class="settings-card">
           <div class="settings-title"><div class="settings-icon">LAN</div><div><h3>手机访问</h3><p>手机和电脑连接同一个局域网即可共用数据库。</p></div></div>
           <div class="lan-help">
             <p>电脑运行本程序后，在手机浏览器输入：</p>
