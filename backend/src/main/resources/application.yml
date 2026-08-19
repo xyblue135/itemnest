@@ -1,0 +1,22 @@
+server:
+  address: 0.0.0.0
+  port: 8765
+
+spring:
+  application:
+    name: itemnest
+  jackson:
+    default-property-inclusion: non_null
+
+itemnest:
+  data-dir: ${ITEMNEST_DATA_DIR:../data}
+  rabbitmq:
+    enabled: ${ITEMNEST_RABBITMQ_ENABLED:true}
+    url: ${ITEMNEST_RABBITMQ_URL:amqp://guest:guest@127.0.0.1/}
+    exchange: ${ITEMNEST_RABBITMQ_EXCHANGE:itemnest.events}
+    queue: ${ITEMNEST_RABBITMQ_QUEUE:itemnest.inventory.events}
+    worker-enabled: ${ITEMNEST_RABBITMQ_WORKER_ENABLED:false}
+
+logging:
+  level:
+    com.xyblue.itemnest: INFO

@@ -1,119 +1,101 @@
-# 物栈 ItemNest v0.5
+# ItemNest
 
-一个面向个人收纳场景的轻量物品管理 App。当前版本已经内置你截至 2026-08-18 更新后的箱子和物品数据，并支持电脑、手机局域网共用同一 SQLite 数据库。v0.5 延续“箱子优先”界面，并将启动方式改为直接使用系统 Python，不再创建或激活 `.venv`。
+个人收纳物品管理项目。
 
-## 已实现
+## 技术栈
 
-- 响应式现代界面：电脑 / 手机浏览器
-- PWA：支持“添加到主屏幕 / 安装 App”
-- 箱子（收纳位置）管理
-- 箱子优先浏览：默认隐藏箱内物品名，点击箱子后在详情面板中查看
-- 物品增 / 删 / 改 / 查
-- 物品数量、模糊数量描述、状态、标签、备注
-- 搜索物品、箱子、标签、备注和状态
-- AI 自然语言查询库存
-- AI 提议新增 / 修改 / 移动 / 删除，用户确认后才执行
-- AI 不可用时自动降级到本地关键词搜索
-- SQLite 本地数据库，无需 MySQL/PostgreSQL
+- 后端：Spring Boot + Java 21
+- 前端：Vue 3 + TypeScript + Vite
+- 数据库：SQLite
+- 消息队列：RabbitMQ
+- AI：OpenAI Compatible API
 
-## Windows 运行
+## 目录
+
+```text
+ItemNest/
+├─ backend/          Spring Boot 后端
+├─ frontend/         Vue 3 前端
+├─ data/             SQLite 与本地配置
+├─ build.bat         构建前后端
+├─ start.bat         启动正式版
+├─ start_dev.bat     开发模式
+└─ start_worker.bat  启动 RabbitMQ Worker
+```
+
+## 环境
+
+需要安装：
+
+- JDK 21（当前项目固定使用 Java 21）
+- Maven：无需全局安装，项目已自带 Maven Wrapper（首次运行会自动下载 Maven 3.9.11）
+- Node.js 20+
+- pnpm
+
+## 开发运行
 
 双击：
 
 ```text
-start.bat
+start_dev.bat
 ```
 
-启动脚本会直接使用系统 Python（Windows 优先 `py -3`，否则使用 `python`）。如果缺少依赖，会自动执行 `python -m pip install -r requirements.txt` 安装到当前系统 Python 环境，不再创建 `.venv`。随后浏览器打开：
+访问：
+
+```text
+http://127.0.0.1:5173
+```
+
+后端 API：
 
 ```text
 http://127.0.0.1:8765
 ```
 
-## 手机使用
+## 正式运行
 
-1. 手机和电脑连接同一个局域网。
-2. Windows 运行 `ipconfig`，找到电脑的 IPv4 地址，例如 `192.168.3.100`。
-3. 手机浏览器打开 `http://192.168.3.100:8765`。
-4. 可使用浏览器菜单“添加到主屏幕”。
+首次构建：
 
-如果手机打不开，检查 Windows 防火墙是否允许 Python/8765 端口在“专用网络”通信。
+```text
+build.bat
+```
 
-## AI 配置
+之后启动：
 
-打开 App → `设置`，填写：
+```text
+start.bat
+```
 
-- Base URL：你的 OpenAI 兼容接口，例如 `http://192.168.3.101:3001/v1`
-- API Key：只保存在服务器本机的 `data/ai_settings.json`
-- 模型：默认 `auto`；如果代理不支持，请改成代理实际提供的聊天模型名
+访问：
 
-**API Key 不会下发给手机前端。** `data/ai_settings.json` 已写入 `.gitignore`，不要把它手动上传到 GitHub。
+```text
+http://127.0.0.1:8765
+```
 
-## 数据库存储方式
+## 数据
 
-ItemNest 使用 **SQLite 单文件关系型数据库**，数据文件是：
+本地数据保存在：
 
 ```text
 data/inventory.db
 ```
 
-核心表：
-
-- `containers`：箱子 / 收纳位置，保存箱子名称、备注和时间。
-- `items`：物品，保存名称、数量、状态、标签、备注，并通过 `container_id` 关联所属箱子。
-- `migrations`：记录已经执行过的数据版本迁移，防止升级时重复导入。
-
-这意味着数据库不是浏览器 LocalStorage，也不是 JSON 清单；电脑端 FastAPI 服务直接读写 `inventory.db`，手机通过局域网访问同一个 FastAPI 服务，因此电脑和手机看到的是同一份数据。
-
-备份时直接复制该文件即可。应用第一次启动且数据库为空时会导入 `seed.py` 中的完整初始清单。v0.6 不修改数据库结构，继续兼容 v0.4 及更早版本的数据。支持从 v0.1 / v0.2 / v0.3 数据库继续升级：把旧版 `inventory.db` 放进新版 `data/` 后启动，程序会按迁移记录自动补齐新增条目，不会覆盖你自己后来添加或修改的其他数据，也不会重复导入。
-
-## 技术栈
-
-- Backend: FastAPI
-- Database: SQLite
-- Frontend: 原生 HTML / CSS / JavaScript
-- AI: OpenAI-compatible `/v1/chat/completions`
-- Message Queue: RabbitMQ + aio-pika
-- App: PWA
-
-## 后续适合增加
-
-- 登录/PIN 和局域网权限控制
-- 物品照片
-- 二维码贴纸：扫码直接进入对应箱子
-- 历史操作记录与撤销
-- 导入/导出 Excel / JSON
-- Embeddings 语义检索（物品很多后再启用）
-- Docker / Windows 单文件 EXE
-- 云端同步或 NAS 部署
-
-
-## v0.3 更新
-
-- 新增 `常用盒子【黑色透明】`：只登记容器，备注“经常打开，内部物品不做统计”
-- 新增 `常用盒子【白色透明】`：纸、笔、便携标签、粘小飞虫板子
-- AI 库存快照增加箱子备注，能够理解“不统计内部物品”的容器
-- 清单总计：14 个箱子、78 类物品
-- 增加 v0.2 → v0.3 的一次性数据库增量迁移
-
-## RabbitMQ 消息队列（v0.6）
-
-v0.6 将 RabbitMQ 作为**可降级的异步事件层**，SQLite 仍然是库存数据的唯一权威来源。新增、编辑、移动或删除物品/箱子时，数据库先正常提交，然后后台再发布 `inventory.#` 事件。因此 RabbitMQ 没启动、网络断开或 Worker 停止，都不会阻止你继续管理库存。
-
-默认连接：
+AI 配置保存在：
 
 ```text
-amqp://guest:guest@127.0.0.1/
-Exchange: itemnest.events
-Queue: itemnest.inventory.events
+data/ai_settings.json
 ```
 
-可使用环境变量修改：`ITEMNEST_RABBITMQ_ENABLED`、`ITEMNEST_RABBITMQ_URL`、`ITEMNEST_RABBITMQ_EXCHANGE`、`ITEMNEST_RABBITMQ_QUEUE`。如果暂时不想使用 RabbitMQ，将 `ITEMNEST_RABBITMQ_ENABLED=0` 即可。
+RabbitMQ Worker 消费日志：
 
-启动 ItemNest 仍然执行 `start.bat`。RabbitMQ Worker 是独立进程，需要时再运行：
+```text
+data/mq_events.jsonl
+```
+
+## RabbitMQ Worker
+
+需要独立消费者时运行：
 
 ```text
 start_worker.bat
 ```
-
-Worker 使用消息确认和 `prefetch_count=16` 消费 durable queue，并把收到的事件以 JSON Lines 形式写入 `data/mq_events.jsonl`。这个日志是异步事件记录，不代替 `data/inventory.db`。

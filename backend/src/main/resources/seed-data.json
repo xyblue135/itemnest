@@ -1,0 +1,711 @@
+{
+  "containers": [
+    {
+      "name": "铭瑄B760M主板箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "硬盘",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,存储"
+        },
+        {
+          "name": "CPU",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,处理器"
+        },
+        {
+          "name": "PCIe类扩展",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,扩展卡"
+        },
+        {
+          "name": "亮机卡",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,显卡"
+        },
+        {
+          "name": "鼠标增重块",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "鼠标,配件"
+        },
+        {
+          "name": "机箱挡板",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,机箱"
+        },
+        {
+          "name": "便宜鼠标",
+          "quantity": 2,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "鼠标"
+        },
+        {
+          "name": "笔记本增高架",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "笔记本,支架"
+        },
+        {
+          "name": "机箱滤网（高密度）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,机箱,防尘"
+        },
+        {
+          "name": "耳机",
+          "quantity": 3,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "音频"
+        },
+        {
+          "name": "HDMI欺骗器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "损坏",
+          "notes": "",
+          "tags": "HDMI,显示,欺骗器"
+        },
+        {
+          "name": "真我 GT Neo5 SE 手机膜和辅助器材",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "手机,真我,GT Neo5 SE"
+        }
+      ]
+    },
+    {
+      "name": "漫步者820NB盒子",
+      "notes": "",
+      "items": [
+        {
+          "name": "羽毛球胶",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "运动"
+        },
+        {
+          "name": "魔方",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "玩具"
+        },
+        {
+          "name": "笔芯",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "文具"
+        },
+        {
+          "name": "手套",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "日用品"
+        },
+        {
+          "name": "玩具等",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "盒内还有其他零散玩具",
+          "tags": "玩具"
+        }
+      ]
+    },
+    {
+      "name": "秒界按摩椅盒子",
+      "notes": "",
+      "items": [
+        {
+          "name": "麦克风简易支架",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "麦克风,支架"
+        },
+        {
+          "name": "订书器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "文具"
+        },
+        {
+          "name": "打气筒",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "工具"
+        },
+        {
+          "name": "防手汗沙袋",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "运动,防手汗"
+        }
+      ]
+    },
+    {
+      "name": "南小萌甜瓜盒子",
+      "notes": "",
+      "items": [
+        {
+          "name": "网线钳",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "网络,工具"
+        },
+        {
+          "name": "网线仪",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "网络,测试"
+        },
+        {
+          "name": "网口",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "网络,RJ45"
+        }
+      ]
+    },
+    {
+      "name": "全家高钙营养奶粉箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "粘钩",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "日用品,收纳"
+        }
+      ]
+    },
+    {
+      "name": "银色箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "测电笔（手动导电）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电工,工具"
+        },
+        {
+          "name": "测电笔（充电）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "精度不高/廉价",
+          "notes": "",
+          "tags": "电工,工具"
+        },
+        {
+          "name": "插排",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电源"
+        },
+        {
+          "name": "DC口大圆口变小圆口",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "DC,转接,电源"
+        },
+        {
+          "name": "鼠标垫",
+          "quantity": 2,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "鼠标,配件"
+        }
+      ]
+    },
+    {
+      "name": "蓝色箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "12V 3A 电源适配器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电源,适配器,12V"
+        },
+        {
+          "name": "12V 2A 电源适配器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电源,适配器,12V"
+        },
+        {
+          "name": "12V 6A 电源适配器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电源,适配器,12V"
+        },
+        {
+          "name": "耳机支架",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "耳机,支架"
+        }
+      ]
+    },
+    {
+      "name": "果冻橙箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "黑色螺丝刀",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "工具,螺丝刀"
+        },
+        {
+          "name": "各种螺丝和基础螺丝刀",
+          "quantity": 1,
+          "quantity_text": "多种",
+          "condition": "正常",
+          "notes": "",
+          "tags": "工具,螺丝,螺丝刀"
+        }
+      ]
+    },
+    {
+      "name": "透明箱子1",
+      "notes": "",
+      "items": [
+        {
+          "name": "报销车票凭证",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "票据,凭证"
+        },
+        {
+          "name": "电池",
+          "quantity": 1,
+          "quantity_text": "一些",
+          "condition": "没电",
+          "notes": "",
+          "tags": "电池"
+        },
+        {
+          "name": "扣子",
+          "quantity": 1,
+          "quantity_text": "一些",
+          "condition": "正常",
+          "notes": "用来缝补衣物",
+          "tags": "衣物,缝补"
+        },
+        {
+          "name": "小夹子",
+          "quantity": 1,
+          "quantity_text": "一些",
+          "condition": "正常",
+          "notes": "",
+          "tags": "日用品"
+        },
+        {
+          "name": "订书钉",
+          "quantity": 1,
+          "quantity_text": "一些",
+          "condition": "正常",
+          "notes": "",
+          "tags": "文具"
+        }
+      ]
+    },
+    {
+      "name": "透明箱子2",
+      "notes": "",
+      "items": [
+        {
+          "name": "橡皮",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "文具"
+        },
+        {
+          "name": "视频接口防尘塞",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "电脑,防尘塞,视频接口"
+        },
+        {
+          "name": "随身WiFi（4G）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "网络,4G,WiFi"
+        },
+        {
+          "name": "移动硬盘盒",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "存储,硬盘盒"
+        },
+        {
+          "name": "显卡欺骗器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "显卡,显示,欺骗器"
+        },
+        {
+          "name": "红外线扫描仪",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "红外,扫描仪"
+        },
+        {
+          "name": "SD卡和SD卡读取器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "SD卡,读卡器,存储"
+        },
+        {
+          "name": "温度传感器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "从保温杯拆下来的",
+          "tags": "传感器,温度"
+        },
+        {
+          "name": "华为手环",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "带充电器",
+          "tags": "华为,手环,穿戴"
+        },
+        {
+          "name": "小黄刀",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "拨线用",
+          "tags": "工具,拨线"
+        },
+        {
+          "name": "镊子",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "工具"
+        },
+        {
+          "name": "白边填充液",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "手机膜,维修"
+        },
+        {
+          "name": "平衡仪（水平仪）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "绿色",
+          "notes": "",
+          "tags": "工具,水平仪"
+        },
+        {
+          "name": "小刀",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "比较锋利，用于削铅笔",
+          "tags": "工具,小刀"
+        },
+        {
+          "name": "电脑清灰工具套装",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "含小方片、翘板、固态硬盘散热贴纸、按压硅脂用指套、硅脂、酒精片",
+          "tags": "电脑,清灰,维修,硅脂"
+        }
+      ]
+    },
+    {
+      "name": "透明超大鱼缸箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "USB-C线材",
+          "quantity": 1,
+          "quantity_text": "非常多",
+          "condition": "正常",
+          "notes": "长线在箱子周围挂着，短线在盒子的盒子里面",
+          "tags": "USB-C,Type-C,线材"
+        },
+        {
+          "name": "USB-A线材",
+          "quantity": 1,
+          "quantity_text": "比较多",
+          "condition": "正常",
+          "notes": "长线在箱子周围挂着，短线在盒子的盒子里面",
+          "tags": "USB-A,线材"
+        },
+        {
+          "name": "USB-C扩展坞（USB-C + USB-A + HDMI）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "USB-C 输入；扩展为 USB-C、USB-A、HDMI 接口",
+          "tags": "扩展坞,USB-C,USB-A,HDMI"
+        },
+        {
+          "name": "USB-C扩展坞（3×USB-A + HDMI，无PD）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "USB-C 输入；3 个 USB-A、1 个 HDMI；无 PD 供电",
+          "tags": "扩展坞,USB-C,USB-A,HDMI,无PD"
+        },
+        {
+          "name": "USB-C扩展坞（USB-A 3.0 + 2×USB-A 2.0 + PD + HDMI）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "USB-C 输入；1 个 USB-A 3.0、2 个 USB-A 2.0、1 个 PD 供电口、1 个 HDMI",
+          "tags": "扩展坞,USB-C,USB-A,USB3.0,USB2.0,PD,HDMI"
+        },
+        {
+          "name": "USB-A扩展坞（网卡口）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "USB-A 输入；扩展为 1 个网卡口",
+          "tags": "扩展坞,USB-A,网卡,以太网,RJ45"
+        },
+        {
+          "name": "USB-A扩展坞（百兆网卡口）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "USB-A 输入；扩展为 1 个百兆网卡口",
+          "tags": "扩展坞,USB-A,网卡,百兆,100Mbps,以太网,RJ45"
+        },
+        {
+          "name": "USB-C转3.5mm音频转换器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "转换器,USB-C,Type-C,3.5mm,音频"
+        },
+        {
+          "name": "USB-B转USB-A转换器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "转换器,USB-B,USB-A"
+        },
+        {
+          "name": "USB-A ↔ USB Micro-B 硬盘线",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "Micro-B 硬盘专用接口",
+          "tags": "USB-A,Micro-B,USB Micro-B,硬盘,线材"
+        },
+        {
+          "name": "USB-A ↔ USB Mini-B 线（白色）",
+          "quantity": 2,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "游戏手柄、麦克风等 Mini-B 接口设备使用；白色",
+          "tags": "USB-A,Mini-B,USB Mini-B,游戏手柄,麦克风,线材,白色"
+        },
+        {
+          "name": "USB-A ↔ USB Mini-B 线（黑色低速率）",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "游戏手柄、麦克风等 Mini-B 接口设备使用；黑色，低速率",
+          "tags": "USB-A,Mini-B,USB Mini-B,游戏手柄,麦克风,线材,黑色,低速率"
+        }
+      ]
+    },
+    {
+      "name": "纯甄酸奶箱子",
+      "notes": "",
+      "items": [
+        {
+          "name": "超长HDMI线材",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "HDMI,线材"
+        },
+        {
+          "name": "1米HDMI线材",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "HDMI,线材"
+        },
+        {
+          "name": "HDMI转VGA + 音频输出 + USB 转接器",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "HDMI,VGA,转接器,USB"
+        },
+        {
+          "name": "HDMI延长线",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "HDMI,延长线"
+        },
+        {
+          "name": "VGA线",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "VGA,线材"
+        },
+        {
+          "name": "VGA视频采集卡",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "可输出为 HDMI 或 USB；通过 USB 时可用 OBS 或手机软件获取视频",
+          "tags": "VGA,视频采集卡,采集卡,HDMI,USB,OBS,手机"
+        }
+      ]
+    },
+    {
+      "name": "常用盒子【黑色透明】",
+      "notes": "经常打开的盒子，内部物品不做统计。",
+      "items": []
+    },
+    {
+      "name": "常用盒子【白色透明】",
+      "notes": "常用物品盒。",
+      "items": [
+        {
+          "name": "纸",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "常用,文具,纸张"
+        },
+        {
+          "name": "笔",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "常用,文具"
+        },
+        {
+          "name": "便携标签",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "常用,标签,收纳,文具"
+        },
+        {
+          "name": "粘小飞虫板子",
+          "quantity": 1,
+          "quantity_text": "",
+          "condition": "正常",
+          "notes": "",
+          "tags": "常用,日用品,粘虫板"
+        }
+      ]
+    }
+  ]
+}

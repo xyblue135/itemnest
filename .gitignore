@@ -1,7 +1,22 @@
-.venv/
-__pycache__/
-*.pyc
+# Local data / secrets
 data/inventory.db
 data/ai_settings.json
+data/mq_events.jsonl
 .env
+
+# Java
+backend/target/
+*.class
+
+# Vue / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Patch artifacts
 *.patch
