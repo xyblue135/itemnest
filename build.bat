@@ -9,8 +9,22 @@ if errorlevel 1 (
   exit /b 1
 )
 
-for /f "tokens=2 delims=\"" %%V in ('java -version 2^>^&1 ^| findstr /i "version"') do set "JAVA_VERSION=%%V"
-echo [ItemNest] Java: %JAVA_VERSION%
+set "JAVA_SPEC_VERSION="
+for /f "tokens=3" %%V in ('java -XshowSettings:properties -version 2^>^&1 ^| findstr /c:"java.specification.version ="') do set "JAVA_SPEC_VERSION=%%V"
+if not defined JAVA_SPEC_VERSION (
+  echo [ItemNest] Unable to detect the Java version.
+  java -version
+  pause
+  exit /b 1
+)
+for /f "tokens=1 delims=." %%V in ("%JAVA_SPEC_VERSION%") do set "JAVA_MAJOR=%%V"
+if %JAVA_MAJOR% LSS 21 (
+  echo [ItemNest] Java %JAVA_SPEC_VERSION% detected. JDK 21 or newer is required.
+  java -version
+  pause
+  exit /b 1
+)
+echo [ItemNest] Java: %JAVA_SPEC_VERSION%
 
 set "PNPM_CMD="
 where pnpm >nul 2>&1 && set "PNPM_CMD=pnpm"
