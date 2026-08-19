@@ -16,6 +16,7 @@ if not exist "backend\target\itemnest-0.7.0.jar" (
 )
 
 set "ITEMNEST_DATA_DIR=%CD%\data"
+set "ITEMNEST_RABBITMQ_ENABLED=true"
 set "ITEMNEST_RABBITMQ_WORKER_ENABLED=true"
 echo [ItemNest] Starting RabbitMQ worker...
 java -jar "backend\target\itemnest-0.7.0.jar" --spring.main.web-application-type=none

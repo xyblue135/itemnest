@@ -23,7 +23,8 @@ if not defined PNPM_CMD (
 
 set "ITEMNEST_DATA_DIR=%CD%\data"
 set "SERVER_PORT=8765"
-start "ItemNest Backend" cmd /k "cd /d ""%CD%\backend"" && set ""ITEMNEST_DATA_DIR=%ITEMNEST_DATA_DIR%"" && call mvnw.cmd spring-boot:run"
+if not defined ITEMNEST_BIND_ADDRESS set "ITEMNEST_BIND_ADDRESS=127.0.0.1"
+start "ItemNest Backend" cmd /k "cd /d ""%CD%\backend"" && set ""ITEMNEST_DATA_DIR=%ITEMNEST_DATA_DIR%"" && set ""SERVER_PORT=%SERVER_PORT%"" && set ""ITEMNEST_BIND_ADDRESS=%ITEMNEST_BIND_ADDRESS%"" && call mvnw.cmd spring-boot:run"
 
 pushd frontend
 if not exist node_modules (
@@ -37,6 +38,6 @@ if not exist node_modules (
 start "" cmd /c "timeout /t 3 /nobreak >nul & start http://127.0.0.1:15473"
 echo [ItemNest] Frontend: http://127.0.0.1:15473
 echo [ItemNest] Backend:  http://127.0.0.1:8765
-call %PNPM_CMD% dev --host 0.0.0.0
+call %PNPM_CMD% dev
 popd
 popd

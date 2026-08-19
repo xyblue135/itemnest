@@ -13,6 +13,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -27,11 +28,13 @@ public class RabbitMqService {
     private final String exchange;
     private final String queue;
     private final AtomicBoolean connected = new AtomicBoolean(false);
+    private final Object connectionLock = new Object();
+    private volatile Connection connection;
     private volatile String lastError = "";
 
     public RabbitMqService(
         ObjectMapper objectMapper,
-        @Value("${itemnest.rabbitmq.enabled:true}") boolean enabled,
+        @Value("${itemnest.rabbitmq.enabled:false}") boolean enabled,
         @Value("${itemnest.rabbitmq.url:amqp://guest:guest@127.0.0.1/}") String url,
         @Value("${itemnest.rabbitmq.exchange:itemnest.events}") String exchange,
         @Value("${itemnest.rabbitmq.queue:itemnest.inventory.events}") String queue
@@ -47,8 +50,9 @@ public class RabbitMqService {
     @EventListener(ApplicationReadyEvent.class)
     public void checkOnStartup() {
         if (!enabled) return;
-        try (Connection connection = newConnection()) {
-            connected.set(connection.isOpen());
+        try {
+            Connection active = ensureConnection();
+            connected.set(active.isOpen());
             lastError = "";
         } catch (Exception ex) {
             connected.set(false);
@@ -67,30 +71,37 @@ public class RabbitMqService {
         envelope.put("created_at", Instant.now().toString());
         envelope.put("payload", payload);
 
-        try (Connection connection = newConnection(); Channel channel = connection.createChannel()) {
-            channel.exchangeDeclare(exchange, "topic", true);
-            channel.queueDeclare(queue, true, false, false, null);
-            channel.queueBind(queue, exchange, "inventory.#");
-            byte[] body = objectMapper.writeValueAsString(envelope).getBytes(StandardCharsets.UTF_8);
-            AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
-                .contentType("application/json")
-                .deliveryMode(2)
-                .messageId(eventId)
-                .timestamp(java.util.Date.from(Instant.now()))
-                .build();
-            channel.basicPublish(exchange, event, properties, body);
+        Connection active = null;
+        try {
+            active = ensureConnection();
+            try (Channel channel = active.createChannel()) {
+                channel.exchangeDeclare(exchange, "topic", true);
+                channel.queueDeclare(queue, true, false, false, null);
+                channel.queueBind(queue, exchange, "inventory.#");
+                byte[] body = objectMapper.writeValueAsString(envelope).getBytes(StandardCharsets.UTF_8);
+                AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
+                    .contentType("application/json")
+                    .deliveryMode(2)
+                    .messageId(eventId)
+                    .timestamp(java.util.Date.from(Instant.now()))
+                    .build();
+                channel.basicPublish(exchange, event, properties, body);
+            }
             connected.set(true);
             lastError = "";
         } catch (Exception ex) {
             connected.set(false);
             lastError = ex.getClass().getSimpleName() + ": " + ex.getMessage();
+            if (active != null) invalidateConnection(active);
         }
     }
 
     public Map<String, Object> status() {
+        Connection active = connection;
+        boolean open = enabled && connected.get() && active != null && active.isOpen();
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("enabled", enabled);
-        status.put("connected", enabled && connected.get());
+        status.put("connected", open);
         status.put("url", safeUrl());
         status.put("exchange", exchange);
         status.put("queue", queue);
@@ -106,6 +117,46 @@ public class RabbitMqService {
         factory.setHandshakeTimeout(2000);
         factory.setAutomaticRecoveryEnabled(false);
         return factory.newConnection("ItemNest");
+    }
+
+    private Connection ensureConnection() throws Exception {
+        Connection current = connection;
+        if (current != null && current.isOpen()) return current;
+        synchronized (connectionLock) {
+            current = connection;
+            if (current != null && current.isOpen()) return current;
+            closeQuietly(current);
+            connection = null;
+            current = newConnection();
+            connection = current;
+            return current;
+        }
+    }
+
+    private void invalidateConnection(Connection failed) {
+        synchronized (connectionLock) {
+            if (failed != null && connection != failed) return;
+            closeQuietly(connection);
+            connection = null;
+        }
+    }
+
+    @PreDestroy
+    public void close() {
+        synchronized (connectionLock) {
+            closeQuietly(connection);
+            connection = null;
+            connected.set(false);
+        }
+    }
+
+    private static void closeQuietly(Connection connection) {
+        if (connection == null) return;
+        try {
+            if (connection.isOpen()) connection.close();
+        } catch (Exception ignored) {
+            // Cleanup must not hide the original publish/reconnect failure.
+        }
     }
 
     public String exchange() { return exchange; }

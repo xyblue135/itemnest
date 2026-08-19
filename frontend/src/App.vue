@@ -33,7 +33,7 @@ const aiSettings = reactive<AiSettings>({ base_url: '', model: 'auto', has_api_k
 const apiKeyInput = ref('')
 const showApiKey = ref(false)
 const settingsSaved = ref(false)
-const mqStatus = reactive<MqStatus>({ enabled: true, connected: false, url: '—', exchange: '—', queue: '—', last_error: '', client: '' })
+const mqStatus = reactive<MqStatus>({ enabled: false, connected: false, url: '—', exchange: '—', queue: '—', last_error: '', client: '' })
 
 const chatInput = ref('')
 const chatBusy = ref(false)
@@ -91,6 +91,33 @@ async function loadAll() {
   if (searching.value) await runSearch()
 }
 
+async function refreshInventoryMeta() {
+  const [s, cs] = await Promise.all([
+    api<Summary>('/api/summary'),
+    api<Container[]>('/api/containers'),
+  ])
+  Object.assign(summary, s)
+  containers.value = cs
+  if (!itemForm.container_id && cs.length) itemForm.container_id = cs[0].id
+  if (searching.value) await runSearch()
+}
+
+async function refreshInventoryData() {
+  const [s, cs, xs] = await Promise.all([
+    api<Summary>('/api/summary'),
+    api<Container[]>('/api/containers'),
+    api<Item[]>('/api/items'),
+  ])
+  Object.assign(summary, s)
+  containers.value = cs
+  items.value = xs
+  if (searching.value) await runSearch()
+}
+
+function upsertItem(item: Item) {
+  items.value = [item, ...items.value.filter(existing => existing.id !== item.id)]
+}
+
 function switchView(view: ViewName) {
   currentView.value = view
 }
@@ -144,13 +171,14 @@ async function saveItem() {
     tags: itemForm.tags.trim(),
   }
   try {
-    await api(itemEditingId.value ? `/api/items/${itemEditingId.value}` : '/api/items', {
+    const saved = await api<Item>(itemEditingId.value ? `/api/items/${itemEditingId.value}` : '/api/items', {
       method: itemEditingId.value ? 'PATCH' : 'POST',
       body: JSON.stringify(payload),
     })
+    upsertItem(saved)
     itemModalOpen.value = false
     toast(itemEditingId.value ? '已保存修改' : '已添加物品')
-    await loadAll()
+    await refreshInventoryMeta()
   } catch (error) {
     toast((error as Error).message)
   }
@@ -160,8 +188,10 @@ async function deleteItem(item: Item) {
   if (!window.confirm(`确定删除“${item.name}”吗？`)) return
   try {
     await api(`/api/items/${item.id}`, { method: 'DELETE' })
+    items.value = items.value.filter(existing => existing.id !== item.id)
+    searchResults.value = searchResults.value.filter(existing => existing.id !== item.id)
     toast('已删除')
-    await loadAll()
+    await refreshInventoryMeta()
   } catch (error) {
     toast((error as Error).message)
   }
@@ -181,7 +211,7 @@ async function saveContainer() {
     })
     containerModalOpen.value = false
     toast('箱子已创建')
-    await loadAll()
+    await refreshInventoryMeta()
   } catch (error) {
     toast((error as Error).message)
   }
@@ -255,7 +285,7 @@ async function executeAction(message: ChatMessage) {
     })
     message.text = `${message.text}\n\n${result.message}`
     message.executed = true
-    await loadAll()
+    await refreshInventoryData()
   } catch (error) {
     message.error = (error as Error).message
   }
@@ -476,7 +506,7 @@ onBeforeUnmount(() => {
         <div class="settings-card">
           <div class="settings-title"><div class="settings-icon">AI</div><div><h3>AI 接口</h3><p>兼容 OpenAI Chat Completions 的代理接口。</p></div></div>
           <form class="settings-form" @submit.prevent="saveSettings">
-            <label>Base URL<input v-model="aiSettings.base_url" placeholder="http://192.168.3.101:3001/v1" /></label>
+            <label>Base URL<input v-model="aiSettings.base_url" placeholder="https://api.openai.com/v1" /></label>
             <label>API Key<div class="password-wrap"><input v-model="apiKeyInput" :type="showApiKey ? 'text' : 'password'" placeholder="已保存时无需重复填写" /><button type="button" @click="showApiKey = !showApiKey">{{ showApiKey ? '隐藏' : '显示' }}</button></div><small :style="{ color: aiSettings.has_api_key ? '#16a34a' : '#98a2b3' }">{{ aiSettings.has_api_key ? 'API Key 已保存在本机服务器' : '尚未保存 API Key' }}</small></label>
             <label>模型<input v-model="aiSettings.model" placeholder="auto" /><small>如果你的代理不支持 auto，请填写实际聊天模型名。</small></label>
             <div class="settings-actions"><button type="submit" class="primary-btn">保存设置</button><span v-if="settingsSaved">已保存</span></div>
@@ -495,8 +525,8 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="settings-card">
-          <div class="settings-title"><div class="settings-icon">LAN</div><div><h3>手机访问</h3><p>生产版仍由 8765 端口提供前后端；开发模式前端使用 5173。</p></div></div>
-          <div class="lan-help"><p>运行 <code>start.bat</code> 后，在手机浏览器输入：</p><code>http://电脑局域网IP:8765</code><p>例如：<code>http://192.168.3.100:8765</code>。</p></div>
+          <div class="settings-title"><div class="settings-icon">LAN</div><div><h3>手机访问</h3><p>生产版由 8765 端口提供前后端；默认只允许本机访问。</p></div></div>
+          <div class="lan-help"><p>需要手机访问时，先设置 <code>ITEMNEST_BIND_ADDRESS=0.0.0.0</code> 再运行 <code>start.bat</code>，然后访问：</p><code>http://电脑局域网IP:8765</code><p>开发模式 Vite 使用 <code>15473</code>，默认同样只监听本机。</p></div>
         </div>
 
         <div class="settings-card warning-card">

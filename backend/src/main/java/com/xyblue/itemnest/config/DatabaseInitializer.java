@@ -49,6 +49,8 @@ public class DatabaseInitializer implements ApplicationRunner {
             """);
         jdbc.execute("CREATE INDEX IF NOT EXISTS idx_items_container ON items(container_id)");
         jdbc.execute("CREATE INDEX IF NOT EXISTS idx_items_name ON items(name)");
+        jdbc.execute("CREATE INDEX IF NOT EXISTS idx_items_condition ON items(condition)");
+        jdbc.execute("CREATE INDEX IF NOT EXISTS idx_items_updated_at ON items(updated_at DESC, id DESC)");
         jdbc.execute("""
             CREATE TABLE IF NOT EXISTS migrations (
                 key TEXT PRIMARY KEY,

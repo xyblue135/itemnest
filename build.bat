@@ -44,7 +44,7 @@ popd
 
 echo [2/2] Building Spring Boot backend...
 pushd backend
-call mvnw.cmd -DskipTests clean package
+call mvnw.cmd clean package
 if errorlevel 1 (
   popd
   pause

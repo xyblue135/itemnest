@@ -20,3 +20,4 @@ frontend/.vite/
 
 # Patch artifacts
 *.patch
+data/

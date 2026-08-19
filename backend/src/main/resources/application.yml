@@ -1,6 +1,6 @@
 server:
-  address: 0.0.0.0
-  port: 8765
+  address: ${ITEMNEST_BIND_ADDRESS:127.0.0.1}
+  port: ${SERVER_PORT:8765}
 
 spring:
   application:
@@ -11,7 +11,7 @@ spring:
 itemnest:
   data-dir: ${ITEMNEST_DATA_DIR:../data}
   rabbitmq:
-    enabled: ${ITEMNEST_RABBITMQ_ENABLED:true}
+    enabled: ${ITEMNEST_RABBITMQ_ENABLED:false}
     url: ${ITEMNEST_RABBITMQ_URL:amqp://guest:guest@127.0.0.1/}
     exchange: ${ITEMNEST_RABBITMQ_EXCHANGE:itemnest.events}
     queue: ${ITEMNEST_RABBITMQ_QUEUE:itemnest.inventory.events}

@@ -1,21 +1,12 @@
 {
-  "name": "物栈 ItemNest",
-  "short_name": "物栈",
-  "description": "私人物品与收纳位置管理",
+  "name": "ItemNest",
+  "short_name": "ItemNest",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f5f7fb",
   "theme_color": "#0b1220",
   "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    {"src":"/icons/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png"}
   ]
 }

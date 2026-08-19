@@ -25,9 +25,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AiService {
-    private static final String DEFAULT_BASE_URL = "http://192.168.3.101:3001/v1";
+    private static final String DEFAULT_BASE_URL = "https://api.openai.com/v1";
     private static final String DEFAULT_MODEL = "auto";
-    private static final Pattern JSON_OBJECT = Pattern.compile("\\{.*}", Pattern.DOTALL);
+    private static final int MAX_AI_CONTEXT_ITEMS = 24;
 
     private final InventoryRepository repository;
     private final ObjectMapper objectMapper;
@@ -44,9 +44,9 @@ public class AiService {
 
     public Map<String, Object> getSettings(boolean includeKey) {
         Map<String, Object> stored = loadFileSettings();
-        String key = firstNonBlank(string(stored.get("api_key")), System.getenv("OPENAI_API_KEY"), "");
-        String baseUrl = firstNonBlank(string(stored.get("base_url")), System.getenv("OPENAI_BASE_URL"), DEFAULT_BASE_URL);
-        String model = firstNonBlank(string(stored.get("model")), System.getenv("OPENAI_MODEL"), DEFAULT_MODEL);
+        String key = firstNonBlank(System.getenv("ITEMNEST_AI_API_KEY"), System.getenv("OPENAI_API_KEY"), string(stored.get("api_key")), "");
+        String baseUrl = firstNonBlank(System.getenv("ITEMNEST_AI_BASE_URL"), System.getenv("OPENAI_BASE_URL"), string(stored.get("base_url")), DEFAULT_BASE_URL);
+        String model = firstNonBlank(System.getenv("ITEMNEST_AI_MODEL"), System.getenv("OPENAI_MODEL"), string(stored.get("model")), DEFAULT_MODEL);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("base_url", baseUrl);
         result.put("model", model);
@@ -76,8 +76,9 @@ public class AiService {
 
         String system = """
             你是一个私人物品数据库助手。用户通过自然语言查询或提出数据库操作要求。
-            你只能依据下面的库存快照回答，不要编造不存在的物品。
+            你只能依据下面的候选库存上下文回答，不要编造不存在的物品。
             对于查询，直接回答位置、数量、状态和备注。
+            如果候选上下文不足以确定答案，要明确说明没有找到足够匹配，不要自行补全。
             对于任何会修改数据库的意图，你只能提出一个待确认 action，绝不能说已经修改成功。
             如果目标不唯一或存在歧义，action 必须为 null，并在 reply 里追问最少必要信息。
 
@@ -93,7 +94,7 @@ public class AiService {
             }
             不要提出 delete_container 操作。数量不明确时可以 quantity=null，并把“一些/很多”等写入 quantity_text。
 
-            """ + inventorySnapshot();
+            """ + inventoryContext(message);
 
         Map<String, Object> payload = Map.of(
             "model", settings.get("model"),
@@ -234,7 +235,8 @@ public class AiService {
         return response("当前 AI 接口不可用，而且本地检索没有找到明显匹配。你可以换一个物品关键词，或到“设置”里检查 API 配置。", null, "local");
     }
 
-    private String inventorySnapshot() {
+    private String inventoryContext(String message) {
+        String lower = message.toLowerCase(Locale.ROOT).trim();
         StringBuilder lines = new StringBuilder("容器列表：\n");
         for (Map<String, Object> c : repository.listContainers()) {
             lines.append("- container_id=").append(c.get("id")).append(" | ").append(c.get("name")).append(" | ")
@@ -242,19 +244,50 @@ public class AiService {
             if (nonBlank(c.get("notes"))) lines.append(" | 备注=").append(c.get("notes"));
             lines.append('\n');
         }
-        lines.append("\n物品列表：\n");
-        for (Map<String, Object> item : repository.listItems("", null)) {
-            Object qty = nonBlank(item.get("quantity_text")) ? item.get("quantity_text") : item.get("quantity");
-            if (qty == null) qty = "未记录";
-            lines.append("- item_id=").append(item.get("id")).append(" | ").append(item.get("name"))
-                .append(" | 数量=").append(qty).append(" | 位置=").append(item.get("container_name"))
-                .append(" (container_id=").append(item.get("container_id")).append(")");
-            if (nonBlank(item.get("condition")) && !"正常".equals(item.get("condition"))) lines.append(" | 状态=").append(item.get("condition"));
-            if (nonBlank(item.get("notes"))) lines.append(" | 备注=").append(item.get("notes"));
-            if (nonBlank(item.get("tags"))) lines.append(" | 标签=").append(item.get("tags"));
-            lines.append('\n');
+
+        List<Map<String, Object>> allItems = repository.listItems("", null);
+        List<Scored> matches = new ArrayList<>();
+        boolean statusQuery = List.of("状态", "异常", "损坏", "坏了", "不正常").stream().anyMatch(lower::contains);
+        for (Map<String, Object> item : allItems) {
+            String itemName = string(item.get("name")).toLowerCase(Locale.ROOT);
+            String condition = string(item.get("condition"));
+            String hay = (string(item.get("name")) + " " + string(item.get("tags")) + " " +
+                string(item.get("notes")) + " " + string(item.get("container_name")) + " " + condition)
+                .toLowerCase(Locale.ROOT);
+            int score = 0;
+            if (!itemName.isBlank() && lower.contains(itemName)) score += 20;
+            for (String token : tokens(lower)) {
+                if (hay.contains(token)) score += 3;
+                else if (token.length() >= 4 && containsAnySubstring(hay, token)) score += 1;
+            }
+            if (statusQuery && !condition.isBlank() && !"正常".equals(condition)) score += 8;
+            if (score > 0) matches.add(new Scored(score, item));
         }
+
+        matches.sort(Comparator.comparingInt(Scored::score).reversed());
+        List<Map<String, Object>> selected;
+        if (matches.isEmpty()) {
+            selected = allItems.stream().limit(MAX_AI_CONTEXT_ITEMS).toList();
+            lines.append("\n未找到明显关键词匹配，以下仅提供最近更新的少量物品作为候选：\n");
+        } else {
+            selected = matches.stream().limit(MAX_AI_CONTEXT_ITEMS).map(Scored::value).toList();
+            lines.append("\n与当前请求最相关的物品候选（最多 ").append(MAX_AI_CONTEXT_ITEMS).append(" 条）：\n");
+        }
+        if (selected.isEmpty()) lines.append("- 当前没有登记物品\n");
+        else selected.forEach(item -> appendItemContext(lines, item));
         return lines.toString();
+    }
+
+    private static void appendItemContext(StringBuilder lines, Map<String, Object> item) {
+        Object qty = nonBlank(item.get("quantity_text")) ? item.get("quantity_text") : item.get("quantity");
+        if (qty == null) qty = "未记录";
+        lines.append("- item_id=").append(item.get("id")).append(" | ").append(item.get("name"))
+            .append(" | 数量=").append(qty).append(" | 位置=").append(item.get("container_name"))
+            .append(" (container_id=").append(item.get("container_id")).append(")");
+        if (nonBlank(item.get("condition")) && !"正常".equals(item.get("condition"))) lines.append(" | 状态=").append(item.get("condition"));
+        if (nonBlank(item.get("notes"))) lines.append(" | 备注=").append(item.get("notes"));
+        if (nonBlank(item.get("tags"))) lines.append(" | 标签=").append(item.get("tags"));
+        lines.append('\n');
     }
 
     private Map<String, Object> extractJson(String text) throws Exception {
@@ -262,10 +295,34 @@ public class AiService {
         try {
             return objectMapper.readValue(clean, new TypeReference<>() {});
         } catch (Exception ignored) {
-            Matcher matcher = JSON_OBJECT.matcher(clean);
-            if (!matcher.find()) throw ignored;
-            return objectMapper.readValue(matcher.group(), new TypeReference<>() {});
+            String json = firstJsonObject(clean);
+            if (json == null) throw ignored;
+            return objectMapper.readValue(json, new TypeReference<>() {});
         }
+    }
+
+    private static String firstJsonObject(String text) {
+        int start = -1;
+        int depth = 0;
+        boolean inString = false;
+        boolean escaped = false;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (inString) {
+                if (escaped) escaped = false;
+                else if (ch == '\\') escaped = true;
+                else if (ch == '"') inString = false;
+                continue;
+            }
+            if (ch == '"') {
+                inString = true;
+            } else if (ch == '{') {
+                if (depth++ == 0) start = i;
+            } else if (ch == '}' && depth > 0 && --depth == 0) {
+                return text.substring(start, i + 1);
+            }
+        }
+        return null;
     }
 
     private Map<String, Object> loadFileSettings() {
