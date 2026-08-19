@@ -54,5 +54,5 @@ popd
 
 echo.
 echo [ItemNest] Build completed.
-echo [ItemNest] JAR: backend\target\itemnest-0.7.0.jar
+echo [ItemNest] JAR: backend\target\itemnest-0.8.0.jar
 popd

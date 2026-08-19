@@ -13,7 +13,7 @@
 
     <groupId>com.xyblue</groupId>
     <artifactId>itemnest</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
     <name>ItemNest</name>
     <description>ItemNest private inventory manager</description>
 

@@ -9,7 +9,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-if not exist "backend\target\itemnest-0.7.0.jar" (
+if not exist "backend\target\itemnest-0.8.0.jar" (
   echo [ItemNest] Application is not built yet. Running build.bat...
   call build.bat
   if errorlevel 1 exit /b 1
@@ -25,5 +25,5 @@ echo [ItemNest] URL: http://127.0.0.1:8765
 echo [ItemNest] Data: %ITEMNEST_DATA_DIR%\inventory.db
 echo [ItemNest] Bind: %ITEMNEST_BIND_ADDRESS%
 echo [ItemNest] Press Ctrl+C to stop.
-java -jar "backend\target\itemnest-0.7.0.jar"
+java -jar "backend\target\itemnest-0.8.0.jar"
 popd

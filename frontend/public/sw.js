@@ -1,4 +1,4 @@
-const CACHE = 'itemnest-v7'
+const CACHE = 'itemnest-v8'
 const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']
 
 self.addEventListener('install', event => {

@@ -7,6 +7,10 @@ spring:
     name: itemnest
   jackson:
     default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
 
 itemnest:
   data-dir: ${ITEMNEST_DATA_DIR:../data}
