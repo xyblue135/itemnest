@@ -317,7 +317,9 @@ function onBeforeInstallPrompt(event: Event) {
 onMounted(async () => {
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => undefined)
+  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => undefined)
+  }
   try {
     await loadAll()
   } catch (error) {

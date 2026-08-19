@@ -34,8 +34,8 @@ if not exist node_modules (
     exit /b 1
   )
 )
-start "" cmd /c "timeout /t 3 /nobreak >nul & start http://127.0.0.1:5173"
-echo [ItemNest] Frontend: http://127.0.0.1:5173
+start "" cmd /c "timeout /t 3 /nobreak >nul & start http://127.0.0.1:15473"
+echo [ItemNest] Frontend: http://127.0.0.1:15473
 echo [ItemNest] Backend:  http://127.0.0.1:8765
 call %PNPM_CMD% dev --host 0.0.0.0
 popd
